@@ -35,7 +35,7 @@ const SecondaryHeader = () => {
       label: 'Study Management',
       items: [
         { label: 'TMF Homepage', path: '/management/tmf-homepage' },
-        { label: 'TMF Viewer', path: '/management/tmf-viewer' },
+        { label: 'TMF Viewer', path: '/tmf-viewer' },
         { label: 'Studies', path: '/management/studies' }
       ]
     },
@@ -117,9 +117,27 @@ const SecondaryHeader = () => {
         >
           Home
         </Button>
+
+        <Button 
+          variant="ghost" 
+          className="h-9 px-3 text-sm font-medium hover:bg-gray-100"
+          onClick={() => navigateTo('/tmf-viewer')}
+        >
+          TMF Viewer
+        </Button>
+
+        <Button 
+          variant="ghost" 
+          className="h-9 px-3 text-sm font-medium hover:bg-gray-100"
+          onClick={() => navigateTo('/tmf-library')}
+        >
+          Library
+        </Button>
+
+
         
         {/* Navigation dropdown menus */}
-        {menuItems.map((menu) => (
+        {/* {menuItems.map((menu) => (
           <div 
             key={menu.id}
             className="dropdown-container relative"
@@ -157,8 +175,9 @@ const SecondaryHeader = () => {
               </div>
             )}
           </div>
-        ))}
+        ))} */}
       </div>
+
 
       {/* Right side controls */}
       <div className="flex items-center space-x-2">

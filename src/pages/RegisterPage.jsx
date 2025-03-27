@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +10,23 @@ import { authService } from "../services/user.service";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: ""
+  });
+
+  // Set up the registration mutation with React Query
+  const registerMutation = useMutation({
+    mutationFn: (userData) => authService.register(userData),
+    onSuccess: () => {
+      navigate("/login");
+    },
+    onError: (err) => {
+      setError(err.message);
+    }
   });
 
   const handleChange = (e) => {
@@ -36,16 +47,7 @@ const RegisterPage = () => {
       return;
     }
     
-    setLoading(true);
-
-    try {
-      await authService.register(formData);
-      navigate("/login");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    registerMutation.mutate(formData);
   };
 
   return (
@@ -64,14 +66,19 @@ const RegisterPage = () => {
                 {error}
               </div>
             )}
+            {registerMutation.error && !error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {registerMutation.error.message}
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="userName">Full Name</Label>
               <Input
-                id="name"
-                name="name"
+                id="userName"
+                name="userName"
                 placeholder="User Name"
                 required
-                value={formData.name}
+                value={formData.userName}
                 onChange={handleChange}
               />
             </div>
@@ -112,8 +119,8 @@ const RegisterPage = () => {
                 onChange={handleChange}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
+            <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+              {registerMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Creating account...

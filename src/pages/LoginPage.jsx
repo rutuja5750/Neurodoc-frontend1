@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +10,17 @@ import { authService } from "../services/user.service";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: ""
+  });
+
+  // Set up the login mutation with React Query
+  const loginMutation = useMutation({
+    mutationFn: (credentials) => authService.login(credentials),
+    onSuccess: () => {
+      navigate("/");
+    }
   });
 
   const handleChange = (e) => {
@@ -26,18 +33,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
-    console.log("Login Data",formData);
-    
-    try {
-      await authService.login(formData);
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    console.log("Login Data", formData);
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -51,9 +48,9 @@ const LoginPage = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
+            {loginMutation.error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {error}
+                {loginMutation.error.message}
               </div>
             )}
             <div className="space-y-2">
@@ -89,8 +86,8 @@ const LoginPage = () => {
                 autoComplete="current-password" 
               />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? (
+            <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+              {loginMutation.isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Logging in...

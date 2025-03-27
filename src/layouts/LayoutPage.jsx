@@ -13,9 +13,8 @@ function LayoutPage() {
       <div className="w-full z-20 mt-14"> {/* Add margin-top to create space */}
         <SecondaryHeader />
       </div>
-      <div className="w-full z-10 mt-16"> {/* Add margin-top to create space */}
+      <div className="w-full z-10 mt-10"> {/* Add margin-top to create space */}
         <Outlet />
-        <HomePage />
       </div>
     </div>
   )

@@ -8,7 +8,7 @@ export const authService = {
       try {
         console.log('Making registration request to:', `${BASE_URL}/register`);
         
-        const { data } = await axios.post('/register', userData);
+        const { data } = await axios.post(`${BASE_URL}/register`, userData);
         console.log('Registration response:', data);
   
         if (!data.success || !data.data || !data.data.token) {
@@ -26,7 +26,7 @@ export const authService = {
   
     async login(credentials) {
       try {
-        const { data } = await axios.post('/login', credentials);
+        const { data } = await axios.post(`${BASE_URL}/login`, credentials);
         
         if (!data.success || !data.data || !data.data.token) {
           throw new Error('Invalid response format from server');
@@ -42,7 +42,7 @@ export const authService = {
   
     async logout() {
       try {
-        await axios.post('/logout');
+        await axios.post(`${BASE_URL}/logout`);
         localStorage.removeItem('user');
       } catch (error) {
         console.error('Logout service error:', error);
