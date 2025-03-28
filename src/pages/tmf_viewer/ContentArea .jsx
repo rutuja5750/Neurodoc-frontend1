@@ -36,7 +36,7 @@ import {
   Download 
 } from 'lucide-react';
 
-import tmfService from '../../services/tmf.serivce';
+import documentService  from '../../services/document.service';
 
 const ContentArea = ({ selectedItem }) => {
   const [documents, setDocuments] = useState([]);
@@ -50,32 +50,11 @@ const ContentArea = ({ selectedItem }) => {
     const fetchDocuments = async () => {
       try {
         let fetchedDocuments = [];
-        fetchedDocuments = await tmfService.document.getAllDocuments();
+
+        fetchedDocuments = await documentService.getAllDocuments();
+
         console.log("Fetched documents:", fetchedDocuments);
 
-        
-        // if (selectedItem) {
-        //   const { type, item } = selectedItem;
-          
-        //   switch (type) {
-        //     case 'zone':
-        //       fetchedDocuments = await tmfService.documents.getAllByZone(item._id);
-        //       break;
-        //     case 'section':
-        //       fetchedDocuments = await tmfService.documents.getAllBySection(item._id);
-        //       break;
-        //     case 'artifact':
-        //       fetchedDocuments = await tmfService.documents.getAllByArtifact(item._id);
-        //       break;
-        //     case 'subArtifact':
-        //       fetchedDocuments = await tmfService.documents.getAllBySubArtifact(item._id);
-        //       break;
-        //   }
-        // } else {
-        //   fetchedDocuments = await tmfService.document.getAllDocuments();
-        //   console.log("Fetched documents:", fetchedDocuments);
-        // }
-  
         setDocuments(fetchedDocuments || []); 
       } catch (error) {
         console.error('Error fetching documents:', error);

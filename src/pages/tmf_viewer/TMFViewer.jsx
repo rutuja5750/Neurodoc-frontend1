@@ -10,6 +10,7 @@ import SubArtifactDialog from '../../components/dialogs/SubArtifactDialog';
 import DocumentDialog from '../../components/dialogs/DocumentDialog ';
 import ContentArea from './ContentArea ';
 import tmfService from '../../services/tmf.serivce';
+import documentService  from '../../services/document.service';
 
 const TMFViewer = () => {
   const [data, setData] = useState({
@@ -232,7 +233,7 @@ const TMFViewer = () => {
         // }
 
         // Call document creation service
-        const newDocument = await tmfService.document.create(userId, formData);
+        const newDocument = await documentService.create(userId, formData)
 
         // Update state with new document
         setData(prev => ({

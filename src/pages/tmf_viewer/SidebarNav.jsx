@@ -19,7 +19,6 @@ const SidebarNav = ({
   loadSections, 
   loadArtifacts, 
   loadSubArtifacts,
-  // loadDocuments 
 }) => {
   const [expanded, setExpanded] = useState({});
   const [loadingStates, setLoadingStates] = useState({});
