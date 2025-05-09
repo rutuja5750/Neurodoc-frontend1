@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router';
+
 import { 
   flexRender,
   getCoreRowModel,
@@ -39,6 +41,8 @@ import {
 import documentService  from '../../services/document.service';
 
 const ContentArea = ({ selectedItem }) => {
+
+  const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -67,11 +71,6 @@ const ContentArea = ({ selectedItem }) => {
 
   // Columns definition with download and additional fields
   const columns = useMemo(() => [
-    {
-      accessorKey: "documentId",
-      header: "ID",
-      cell: ({ row }) => <div className="px-2 text-left">{row.getValue("documentId") || 'N/A'}</div>,
-    },
     {
       accessorKey: "documentTitle",
       header: "Title",
@@ -189,6 +188,10 @@ const ContentArea = ({ selectedItem }) => {
     table.setGlobalFilter(value);
   };
 
+  const handleRowClick = (id) => {
+    navigate(`/tmf-viewer/document/${id}`, { replace: true });
+  }
+
   return (
     <div className="h-full flex flex-col">
       <Card className="h-full flex flex-col">
@@ -261,6 +264,11 @@ const ContentArea = ({ selectedItem }) => {
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleRowClick(row.original._id);
+                      }}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
