@@ -26,37 +26,19 @@ const SubArtifactDialog = ({ open, parentId, onClose, onSubmit }) => {
     defaultValues: {
       subArtifactNumber: '',
       subArtifactName: '',
-      description: '',
       isRequired: true,
       isActive: true,
-      'metadata.lifecycle': 'Draft',
-      placeholders: ''
     }
   });
 
-  const lifecycle = watch('metadata.lifecycle');
-
-  const handleLifecycleChange = (value) => {
-    setValue('metadata.lifecycle', value);
-  };
-
   const submitForm = async (data) => {
     // Transform placeholders string to array
-    const placeholders = data.placeholders.split(',')
-      .map(item => item.trim())
-      .filter(item => item.length > 0);
     
     const formattedData = {
       ...data,
-      metadata: {
-        lifecycle: data['metadata.lifecycle'],
-        placeholders
-      }
+      
     };
-    
-    delete formattedData['metadata.lifecycle'];
-    delete formattedData.placeholders;
-    
+   
     await onSubmit(formattedData);
     reset();
   };
@@ -100,46 +82,7 @@ const SubArtifactDialog = ({ open, parentId, onClose, onSubmit }) => {
               <p className="text-sm text-red-500">{errors.subArtifactName.message}</p>
             )}
           </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the purpose of this sub-artifact..."
-              {...register('description')}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="placeholders">Placeholders</Label>
-            <Input
-              id="placeholders"
-              placeholder="e.g., SITE_ID,STUDY_ID,DATE (comma separated)"
-              {...register('placeholders')}
-            />
-            <p className="text-xs text-muted-foreground">
-              Enter placeholder variables separated by commas
-            </p>
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="metadata.lifecycle">Lifecycle Stage</Label>
-            <Select 
-              value={lifecycle} 
-              onValueChange={handleLifecycleChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select lifecycle stage" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Draft">Draft</SelectItem>
-                <SelectItem value="Review">Review</SelectItem>
-                <SelectItem value="Approved">Approved</SelectItem>
-                <SelectItem value="Archived">Archived</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
+           
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="isRequired" 

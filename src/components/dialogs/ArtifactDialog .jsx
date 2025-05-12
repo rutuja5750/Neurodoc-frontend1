@@ -20,8 +20,6 @@ const ArtifactDialog = ({ open, parentId, onClose, onSubmit }) => {
       artifactNumber: '',
       artifactName: '',
       ichCode: '',
-      artifactSubcategory: '',
-      description: '',
       isRequired: true,
       isActive: true
     }
@@ -78,24 +76,6 @@ const ArtifactDialog = ({ open, parentId, onClose, onSubmit }) => {
               id="ichCode"
               placeholder="e.g., E6"
               {...register('ichCode')}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="artifactSubcategory">Subcategory</Label>
-            <Input
-              id="artifactSubcategory"
-              placeholder="e.g., Management"
-              {...register('artifactSubcategory')}
-            />
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the purpose of this artifact..."
-              {...register('description')}
             />
           </div>
           

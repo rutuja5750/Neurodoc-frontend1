@@ -80,10 +80,7 @@ const DocumentDialog = ({
     watch 
   } = useForm({
     defaultValues: {
-      documentId: '',
       documentTitle: '',
-      documentType: 'PDF',
-      status: 'Draft',
       effectiveDate: null,
       expirationDate: null,
       accessLevel: 'Restricted',
@@ -96,8 +93,6 @@ const DocumentDialog = ({
   });
 
   // Watchers for dynamic form updates
-  const status = watch('status');
-  const documentType = watch('documentType');
   const accessLevel = watch('accessLevel');
   const effectiveDate = watch('effectiveDate');
   const expirationDate = watch('expirationDate');
@@ -318,14 +313,7 @@ const DocumentDialog = ({
     }
   };
 
-  // Change handlers for form fields
-  const handleStatusChange = (value) => {
-    setValue('status', value);
-  };
 
-  const handleDocumentTypeChange = (value) => {
-    setValue('documentType', value);
-  };
 
   const handleAccessLevelChange = (value) => {
     setValue('accessLevel', value);
@@ -389,9 +377,7 @@ const DocumentDialog = ({
       // Prepare document data to match schema
       const documentData = {
         // Identification
-        documentId: data.documentId,
         documentTitle: data.documentTitle,
-        documentType: data.documentType,
         version: data.version,
         
         // Hierarchy references
@@ -634,19 +620,6 @@ const DocumentDialog = ({
               </Select>
             </div>
           </div>
-          
-          {/* Document ID Input */}
-          <div className="grid gap-2">
-            <Label htmlFor="documentId">Document ID <span className="text-red-500">*</span></Label>
-            <Input
-              id="documentId"
-              placeholder="e.g., DOC-001"
-              {...register('documentId', { required: 'Document ID is required' })}
-            />
-            {errors.documentId && (
-              <p className="text-sm text-red-500">{errors.documentId.message}</p>
-            )}
-          </div>
 
           {/* Document Title Input */}
           <div className="grid gap-2">
@@ -659,49 +632,6 @@ const DocumentDialog = ({
             {errors.documentTitle && (
               <p className="text-sm text-red-500">{errors.documentTitle.message}</p>
             )}
-          </div>
-          
-          {/* Document Type and Status */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="documentType">Document Type</Label>
-              <Select 
-                value={documentType} 
-                onValueChange={handleDocumentTypeChange}
-              >
-                <SelectTrigger id="documentType">
-                  <SelectValue placeholder="Select document type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PDF">PDF</SelectItem>
-                  <SelectItem value="DOCX">DOCX</SelectItem>
-                  <SelectItem value="XLSX">XLSX</SelectItem>
-                  <SelectItem value="PPTX">PPTX</SelectItem>
-                  <SelectItem value="TXT">TXT</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="status">Status</Label>
-              <Select 
-                value={status} 
-                onValueChange={handleStatusChange}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="In Review">In Review</SelectItem>
-                  <SelectItem value="Approved">Approved</SelectItem>
-                  <SelectItem value="Effective">Effective</SelectItem>
-                  <SelectItem value="Superseded">Superseded</SelectItem>
-                  <SelectItem value="Withdrawn">Withdrawn</SelectItem>
-                  <SelectItem value="Archived">Archived</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           
           {/* Effective and Expiration Dates */}

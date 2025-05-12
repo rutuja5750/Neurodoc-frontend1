@@ -19,7 +19,6 @@ const SectionDialog = ({ open, parentId, onClose, onSubmit }) => {
     defaultValues: {
       sectionNumber: '',
       sectionName: '',
-      description: '',
       isRequired: true,
       isActive: true
     }
@@ -68,15 +67,6 @@ const SectionDialog = ({ open, parentId, onClose, onSubmit }) => {
             {errors.sectionName && (
               <p className="text-sm text-red-500">{errors.sectionName.message}</p>
             )}
-          </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the purpose of this section..."
-              {...register('description')}
-            />
           </div>
           
           <div className="flex items-center space-x-2">

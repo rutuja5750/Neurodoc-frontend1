@@ -19,7 +19,6 @@ const ZoneDialog = ({ open, onClose, onSubmit }) => {
     defaultValues: {
       zoneNumber: '',
       zoneName: '',
-      description: '',
       isActive: true
     }
   });
@@ -72,16 +71,7 @@ const ZoneDialog = ({ open, onClose, onSubmit }) => {
               <p className="text-sm text-red-500">{errors.zoneName.message}</p>
             )}
           </div>
-          
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe the purpose of this zone..."
-              {...register('description')}
-            />
-          </div>
-          
+            
           <div className="flex items-center space-x-2">
             <Checkbox 
               id="isActive" 

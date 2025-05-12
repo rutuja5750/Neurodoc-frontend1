@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import LayoutPage from "./layouts/LayoutPage";
@@ -9,6 +10,13 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminGuard from "./components/guards/AdminGuard";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from "@/components/ui/toaster"
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import LayoutPage from "./layouts/LayoutPage.jsx";
+import HomePage from "./pages/HomePage";
+import TMF_Viewer from "./pages/tmf_viewer/TMFViewer";
+import DocumentViewer from "./pages/tmf_viewer/DocumentViewer";
+
 import ClinicalTrialsPage from "./pages/clinical-trials/ClinicalTrialsPage";
 import TestUpload from "./pages/clinical-trials/components/TestUpload";
 import DocumentList from "./pages/documents/DocumentList";
@@ -45,7 +53,10 @@ function App() {
             >
                 <Route index element={<Navigate to="/home" replace />} />
                 <Route path="home" element={<HomePage/>} />
+
                 <Route path="tmf-viewer" element={<TMF_Viewer/>} />
+                <Route path="tmf-viewer/document/:id" element={<DocumentViewer/>} />
+
             </Route>
 
             {/* Admin routes */}
