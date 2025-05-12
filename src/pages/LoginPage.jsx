@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,14 @@ const LoginPage = () => {
   // Set up the login mutation with React Query
   const loginMutation = useMutation({
     mutationFn: (credentials) => authService.login(credentials),
-    onSuccess: () => {
-      navigate("/");
+    onSuccess: (data) => {
+        console.log(data, 'this is th')
+      // Check if user is admin
+      if (data.user.role === 'ETMF_ADMIN') {
+        navigate("/admin");
+      } else {
+        navigate("/home");
+      }
     }
   });
 
