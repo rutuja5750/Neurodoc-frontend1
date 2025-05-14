@@ -162,22 +162,6 @@ export default function ClinicalTrialsPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Nav */}
-      <header className="h-16 flex items-center justify-between px-8 bg-white border-b shadow-sm z-10">
-        <div className="flex items-center gap-4">
-          <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
-          <span className="font-bold text-xl tracking-tight text-blue-900">NeuroDoc Vault</span>
-        </div>
-        <div className="flex items-center gap-6">
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-blue-700" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1">3</span>
-          </Button>
-          <div className="flex items-center gap-2">
-            <img src="/avatars/01.png" alt="User" className="h-8 w-8 rounded-full" />
-            <span className="font-medium text-gray-700">Admin</span>
-          </div>
-        </div>
-      </header>
       <div className="flex flex-1">
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r shadow-sm flex flex-col py-8 px-4">
