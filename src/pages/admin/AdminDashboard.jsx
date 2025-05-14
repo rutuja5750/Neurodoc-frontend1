@@ -6,7 +6,7 @@ import {
   Users, FileText, Settings, Activity, Shield, 
   BarChart3, Building2, Globe2, AlertTriangle,
   Clock, TrendingUp, CheckCircle2, XCircle,
-  TrendingDown, Link, Plus
+  TrendingDown, Link, Plus, ClipboardList, FileSearch
 } from 'lucide-react';
 import StudyManagement from './studies/StudyManagement';
 import UserManagement from './users/UserManagement';
@@ -14,6 +14,8 @@ import ComplianceDashboard from './compliance/ComplianceDashboard';
 import SystemSettings from './settings/SystemSettings';
 import SiteManagement from './SiteManagement';
 import SiteAssignmentManagement from '../../components/sites/SiteAssignmentManagement';
+import ClinicalTrialsPage from '../clinical-trials/ClinicalTrialsPage';
+import TMF_Viewer from '../tmf_viewer/TMFViewer';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -72,7 +74,7 @@ const AdminDashboard = () => {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid grid-cols-7 gap-4 bg-transparent h-auto p-0">
+        <TabsList className="grid grid-cols-9 gap-4 bg-transparent h-auto p-0">
           <TabsTrigger
             value="overview"
             className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -86,6 +88,20 @@ const AdminDashboard = () => {
           >
             <FileText className="w-4 h-4 mr-2" />
             Studies
+          </TabsTrigger>
+          <TabsTrigger
+            value="clinical-trials"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            <ClipboardList className="w-4 h-4 mr-2" />
+            Clinical Trials
+          </TabsTrigger>
+          <TabsTrigger
+            value="tmf-viewer"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+          >
+            <FileSearch className="w-4 h-4 mr-2" />
+            TMF Viewer
           </TabsTrigger>
           <TabsTrigger
             value="facilities"
@@ -225,6 +241,22 @@ const AdminDashboard = () => {
 
         <TabsContent value="studies">
           <StudyManagement />
+        </TabsContent>
+
+        <TabsContent value="clinical-trials">
+          <Card>
+            <CardContent className="p-6">
+              <ClinicalTrialsPage />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tmf-viewer">
+          <Card>
+            <CardContent className="p-6">
+              <TMF_Viewer />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="facilities">
