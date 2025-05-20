@@ -7,6 +7,7 @@ import {
   Calendar,
   MessageSquare,
   HelpCircle,
+  Shield,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -35,6 +36,11 @@ const navigation = [
     name: 'Messages',
     href: '/messages',
     icon: MessageSquare,
+  },
+  {
+    name: 'Super Admin',
+    href: '/admin/super',
+    icon: Shield,
   },
 ];
 
