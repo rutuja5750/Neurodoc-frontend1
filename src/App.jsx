@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LayoutPage from "./layouts/LayoutPage.jsx";
 import HomePage from "./pages/HomePage";
 import TMF_Viewer from "./pages/tmf_viewer/TMFViewer";
+import TMF_Library from "./pages/tmf_viewer/TMFLibrary";
 import DocumentViewer from "./pages/tmf_viewer/DocumentViewer";
 
 
@@ -50,6 +51,7 @@ function App() {
                 <Route path="home" element={<HomePage/>} />
 
                 <Route path="tmf-viewer" element={<TMF_Viewer/>} />
+                <Route path="tmf-library" element={<TMF_Library/>} />
                 <Route path="tmf-viewer/document/:id" element={<DocumentViewer/>} />
 
             </Route>

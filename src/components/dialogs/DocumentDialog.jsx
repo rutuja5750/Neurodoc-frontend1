@@ -299,6 +299,40 @@ const artifactNames = [
   "Statistical Report"
 ];
 
+// Predefined list of sub-artifact names
+const subArtifactNames = [
+  "Version 1.0",
+  "Version 2.0",
+  "Version 3.0",
+  "Draft",
+  "Final",
+  "Approved",
+  "Pending Review",
+  "Under Review",
+  "Revision 1",
+  "Revision 2",
+  "Revision 3",
+  "Initial Submission",
+  "Updated Submission",
+  "Final Submission",
+  "Interim Report",
+  "Final Report",
+  "Annual Report",
+  "Quarterly Report",
+  "Monthly Report",
+  "Weekly Report",
+  "Daily Report",
+  "Summary Report",
+  "Detailed Report",
+  "Technical Report",
+  "Progress Report",
+  "Status Report",
+  "Compliance Report",
+  "Quality Report",
+  "Safety Report",
+  "Efficacy Report"
+];
+
 const DocumentDialog = ({ 
   open, 
   initialSelectedItem,
@@ -874,9 +908,9 @@ const DocumentDialog = ({
                       <Loader2 className="h-4 w-4 animate-spin" />
                     </div>
                   ) : (
-                    hierarchyState.subArtifacts[selectedHierarchy.artifact?._id]?.map(subArtifact => (
-                      <SelectItem key={subArtifact._id} value={subArtifact._id}>
-                        {subArtifact.subArtifactNumber} {subArtifact.subArtifactName}
+                    subArtifactNames.map((subArtifactName, index) => (
+                      <SelectItem key={index} value={subArtifactName}>
+                        {subArtifactName}
                       </SelectItem>
                     ))
                   )}

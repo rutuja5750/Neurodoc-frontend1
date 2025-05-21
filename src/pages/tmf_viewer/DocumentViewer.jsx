@@ -49,12 +49,18 @@ function DocumentViewer() {
                 const response = await fetch(documentData.fileUrl);
                 const blob = await response.blob();
                 
-                if (documentData.fileFormat.includes('pdf')) {
+                // Determine file format from URL or documentData
+                const fileFormat = documentData.fileFormat || documentData.fileUrl.split('.').pop().toLowerCase();
+                
+                if (fileFormat.includes('pdf')) {
                     const url = URL.createObjectURL(blob);
                     setDocumentContent(url);
-                } else if (documentData.fileFormat.includes('word') || 
-                          documentData.fileFormat.includes('excel') || 
-                          documentData.fileFormat.includes('powerpoint')) {
+                } else if (fileFormat.includes('doc') || 
+                          fileFormat.includes('docx') || 
+                          fileFormat.includes('xls') || 
+                          fileFormat.includes('xlsx') || 
+                          fileFormat.includes('ppt') || 
+                          fileFormat.includes('pptx')) {
                     const encodedUrl = encodeURIComponent(documentData.fileUrl);
                     setDocumentContent(`https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`);
                 } else {

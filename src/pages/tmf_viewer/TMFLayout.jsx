@@ -225,7 +225,8 @@ const TMFLayout = ({ children }) => {
 
             // Get user ID from local storage
             const user = localStorage.getItem('user');
-            const userId = user ? JSON.parse(user)._id : null;
+            // const userId = user ? JSON.parse(user)._id : null;
+            const userId = '67eb40dcddde69be0369d620'
 
             if (!userId) throw new Error("User not authenticated");
 
