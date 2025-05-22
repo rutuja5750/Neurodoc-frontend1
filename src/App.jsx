@@ -14,6 +14,7 @@ import ClinicalTrialsPage from "./pages/clinical-trials/ClinicalTrialsPage";
 import TestUpload from "./pages/clinical-trials/components/TestUpload";
 import DocumentList from "./pages/documents/DocumentList";
 import DocumentReview from "./pages/DocumentReview";
+import SuperAdminDashboard from './pages/SuperAdminDashboard';
 
 // Protected Route component
 const AuthProvider = ({ children }) => {
@@ -48,19 +49,14 @@ function App() {
             >
                 <Route index element={<Navigate to="/home" replace />} />
                 <Route path="home" element={<HomePage/>} />
-
                 <Route path="tmf-viewer" element={<TMF_Viewer/>} />
                 {/* <Route path="tmf-library" element={<TMF_Library/>} /> */}
                 <Route path="tmf-viewer/document/:id" element={<DocumentViewer/>} />
-
             </Route>
 
             {/* Admin routes */}
-            <Route path="/admin" element={
-                //   <AdminGuard>
-                    <AdminDashboard />
-                //   </AdminGuard>
-                } />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/super" element={<SuperAdminDashboard />} />
           </Routes>
       </BrowserRouter>
       <Toaster />
