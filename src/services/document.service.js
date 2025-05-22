@@ -1,7 +1,7 @@
 import { config } from '../config/config';
 import axios from 'axios';
 
-const API_URL = `${config.API_URL}/api/tmf/documents`
+const API_URL = `${config.API_URL}/api/documents`;
 
 const documentService = {
     create: async (userId, formData) => {

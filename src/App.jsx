@@ -14,7 +14,7 @@ import DocumentViewer from "./pages/tmf_viewer/DocumentViewer";
 // import TestUpload from "./pages/clinical-trials/components/TestUpload";
 import DocumentList from "./pages/documents/DocumentList";
 import DocumentReview from "./pages/documents/DocumentReview";
-
+import TMF_Library from "./pages/tmf_viewer/TMFLibrary";
 // Protected Route component
 const AuthProvider = ({ children }) => {
   const user = userService.getCurrentUser();
@@ -48,11 +48,9 @@ function App() {
             >
                 <Route index element={<Navigate to="/home" replace />} />
                 <Route path="home" element={<HomePage/>} />
-
                 <Route path="tmf-viewer" element={<TMF_Viewer/>} />
-                {/* <Route path="tmf-library" element={<TMF_Library/>} /> */}
+                <Route path="tmf-library" element={<TMF_Library/>} />
                 <Route path="tmf-viewer/document/:id" element={<DocumentViewer/>} />
-
             </Route>
 
             {/* Admin routes */}

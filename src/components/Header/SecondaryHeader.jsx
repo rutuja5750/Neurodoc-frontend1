@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ChevronDown, Plus, Settings } from 'lucide-react';
@@ -124,6 +124,14 @@ const SecondaryHeader = () => {
           onClick={() => navigateTo('/tmf-viewer')}
         >
           TMF Viewer
+        </Button>
+
+        <Button 
+          variant="ghost" 
+          className="h-9 px-3 text-sm font-medium hover:bg-gray-100"
+          onClick={() => navigateTo('/documents')}
+        >
+          Documents
         </Button>
 
         <Button 
