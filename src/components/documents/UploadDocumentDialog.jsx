@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { azureStorageService } from '@/services/azureStorage.service';
 import { Loader2, Upload } from 'lucide-react';
 import axios from 'axios';
 
@@ -76,8 +75,6 @@ const UploadDocumentDialog = ({ isOpen, onClose, onUploadComplete, existingDocum
 
     try {
       setIsUploading(true);
-      
-      const result = await azureStorageService.uploadDocument(selectedFile, metadata);
       
       if (existingDocument) {
         try {

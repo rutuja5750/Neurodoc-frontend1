@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { MoreVertical, Edit, Trash, Archive, FileCheck, History } from 'lucide-react';
-import EditDocumentDialog from '../dialogs/EditDocumentDialog';
+import DocumentDialog from '../dialogs/DocumentDialog';
 import VersionHistory from './VersionHistory';
 
 export default function DocumentActionsMenu({ document, onEdit, onDelete, onArchive, onVersionHistory }) {
@@ -32,7 +32,12 @@ export default function DocumentActionsMenu({ document, onEdit, onDelete, onArch
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <EditDocumentDialog open={editOpen} onClose={() => setEditOpen(false)} document={document} onSave={onEdit} />
+      <DocumentDialog 
+        open={editOpen} 
+        onClose={() => setEditOpen(false)} 
+        initialSelectedItem={document} 
+        onSubmit={onEdit} 
+      />
       <VersionHistory open={versionOpen} onClose={() => setVersionOpen(false)} documentId={document._id} />
     </>
   );

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { authService } from "../services/user.service";
+import { userService } from "../services/user.service";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const RegisterPage = () => {
 
   // Set up the registration mutation with React Query
   const registerMutation = useMutation({
-    mutationFn: (userData) => authService.register(userData),
+    mutationFn: (userData) => userService.register(userData),
     onSuccess: () => {
       navigate("/login");
     },

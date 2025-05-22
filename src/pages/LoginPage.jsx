@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
-import { authService } from "../services/user.service";
+import { userService } from "../services/user.service";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -17,15 +17,9 @@ const LoginPage = () => {
 
   // Set up the login mutation with React Query
   const loginMutation = useMutation({
-    mutationFn: (credentials) => authService.login(credentials),
-    onSuccess: (data) => {
-        console.log(data, 'this is th')
-      // Check if user is admin
-      if (data.user.role === 'ETMF_ADMIN') {
-        navigate("/admin");
-      } else {
-        navigate("/home");
-      }
+    mutationFn: (credentials) => userService.login(credentials),
+    onSuccess: () => {
+      navigate("/");
     }
   });
 
