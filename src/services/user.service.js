@@ -3,7 +3,7 @@ import { config } from "../config/config";
 
 const BASE_URL = `${config.API_URL}/api/users`;
 
-export const authService = {
+export const userService = {
     async register(userData) {
       try {
         console.log('Making registration request to:', `${BASE_URL}/register`);

@@ -11,15 +11,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Search, Bell, User, Settings, LogOut } from 'lucide-react';
-import { authService } from '../../services/user.service';
+import { userService } from '../../services/user.service';
 
 const Header = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const user = authService.getCurrentUser();
+  const user = userService.getCurrentUser();
 
   const handleLogout = () => {
-    authService.logout();
+    userService.logout();
     navigate('/login');
   };
 
