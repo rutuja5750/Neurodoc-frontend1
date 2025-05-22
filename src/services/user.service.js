@@ -3,7 +3,7 @@ import { config } from "../config/config";
 
 const BASE_URL = `${config.API_URL}/api/users`;
 
-export const authService = {
+export const userService = {
     async register(userData) {
       try {
         console.log('Making registration request to:', `${BASE_URL}/register`);
@@ -26,14 +26,11 @@ export const authService = {
   
     async login(credentials) {
       try {
-        const { data } = await axios.post(`${BASE_URL}/login`, credentials);
+        const response = await axios.post(`${BASE_URL}/login`, credentials);
+        const data = response.data;
         
-        if (!data.success || !data.data || !data.data.token) {
-          throw new Error('Invalid response format from server');
-        }
-  
-        localStorage.setItem('user', JSON.stringify(data.data));
-        return data.data;
+        localStorage.setItem('user', JSON.stringify(data));
+        return data;
       } catch (error) {
         console.error('Login service error:', error);
         throw new Error(error.response?.data?.message || 'Login failed');
@@ -69,4 +66,6 @@ export const authService = {
         return null;
       }
     },
-}; 
+};
+
+export { userService as authService }; 
