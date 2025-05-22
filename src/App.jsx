@@ -21,6 +21,8 @@ const AuthProvider = ({ children }) => {
   if (!user) {
     return <Navigate to="/login" />;
   }
+
+  
   return children;
 };
 
@@ -48,6 +50,7 @@ function App() {
                 <Route path="home" element={<HomePage/>} />
 
                 <Route path="tmf-viewer" element={<TMF_Viewer/>} />
+                {/* <Route path="tmf-library" element={<TMF_Library/>} /> */}
                 <Route path="tmf-viewer/document/:id" element={<DocumentViewer/>} />
 
             </Route>
