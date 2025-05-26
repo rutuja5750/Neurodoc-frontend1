@@ -15,6 +15,7 @@ import DocumentViewer from "./pages/tmf_viewer/DocumentViewer";
 import DocumentList from "./pages/documents/DocumentList";
 import DocumentReview from "./pages/documents/DocumentReview";
 import TMF_Library from "./pages/tmf_viewer/TMFLibrary";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 // Protected Route component
 const AuthProvider = ({ children }) => {
   const user = userService.getCurrentUser();
@@ -54,11 +55,16 @@ function App() {
             </Route>
 
             {/* Admin routes */}
-            <Route path="/admin" element={
-                //   <AdminGuard>
-                    <AdminDashboard />
-                //   </AdminGuard>
-                } />
+                <Route path="/admin" element={
+                    //   <AdminGuard>
+                        <AdminDashboard />
+                    //   </AdminGuard>
+                    } />
+                <Route path="/admin/super" element={
+                    //   <AdminGuard>
+                        <SuperAdminDashboard />
+                    //   </AdminGuard>
+                    } />
           </Routes>
       </BrowserRouter>
       <Toaster />
