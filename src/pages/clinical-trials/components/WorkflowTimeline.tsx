@@ -28,7 +28,7 @@ const WorkflowTimeline: React.FC<WorkflowTimelineProps> = ({ currentStatus, step
       <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
       
       <div className="space-y-8">
-        {steps.map((step, index) => {
+        {steps.map((step) => {
           const status = getStepStatus(step);
           
           return (

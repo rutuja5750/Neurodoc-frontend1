@@ -147,7 +147,7 @@ const WorkflowActionsPanel: React.FC<WorkflowActionsPanelProps> = ({
                   <Textarea
                     id={`comment-${action.action}`}
                     value={comment}
-                    onChange={(e) => setComment(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComment(e.target.value)}
                     placeholder="Enter your comment here..."
                     className="mt-1"
                   />
@@ -166,7 +166,7 @@ const WorkflowActionsPanel: React.FC<WorkflowActionsPanelProps> = ({
                     id={`signature-${action.action}`}
                     type="password"
                     value={signature}
-                    onChange={(e) => setSignature(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSignature(e.target.value)}
                     placeholder="Enter your signature"
                     className="mt-1"
                   />

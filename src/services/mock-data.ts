@@ -1,4 +1,4 @@
-import { Document, AuditLogEntry } from './clinical-trials.service';
+// Removed unused imports
 
 // Sample PDF files encoded in base64 (minimal valid PDFs)
 const samplePDFs = {

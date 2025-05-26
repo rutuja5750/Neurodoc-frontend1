@@ -1,19 +1,31 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 const API_URL = 'http://localhost:3000/api/tmf';
+
+export interface Document {
+  id: string;
+  title: string;
+  status: string;
+  lastModified: string;
+  // Add other document properties as needed
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  timestamp: string;
+  user: string;
+  details: string;
+  // Add other audit log properties as needed
+}
 
 class ClinicalTrialsService {
     async getDocuments() {
         try {
-            console.log('Fetching all documents...');
-            
             const response = await axios.get(`${API_URL}/documents`);
-            console.log('Documents API response:', response.data);
-            
             return response.data;
         } catch (error) {
-            console.error('Error fetching documents:', error);
-            throw error;
+            this.handleError(error);
         }
     }
 
@@ -24,105 +36,90 @@ class ClinicalTrialsService {
         version?: string;
         notes?: string;
     }, onUploadProgress?: (progressEvent: any) => void) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('title', metadata.title.trim());
+        formData.append('type', metadata.category.toUpperCase());
+        formData.append('study', metadata.studyId);
+        formData.append('site', 'DEFAULT_SITE');
+        formData.append('country', 'US');
+        formData.append('documentType', metadata.category);
+        formData.append('documentId', `DOC-${Date.now()}`);
+        formData.append('documentDate', new Date().toISOString());
+        formData.append('mimeType', file.type);
+        formData.append('fileSize', file.size.toString());
+        formData.append('tmfReference', `TMF-${Date.now()}`);
+        formData.append('uploadedBy', 'system');
+        formData.append('author', 'system');
+
+        const additionalMetadata = {
+            version: metadata.version || '1.0',
+            notes: metadata.notes || '',
+            status: 'DRAFT',
+            category: metadata.category,
+            studyId: metadata.studyId,
+            mimeType: file.type,
+            fileSize: file.size,
+            documentDate: new Date().toISOString(),
+            uploadedBy: 'system',
+            author: 'system'
+        };
+        formData.append('metadata', JSON.stringify(additionalMetadata));
+
         try {
-            // Create form data
-    const formData = new FormData();
-    formData.append('file', file);
-
-            // Add required fields directly to form data
-            formData.append('title', metadata.title.trim());
-            formData.append('type', metadata.category.toUpperCase());
-            formData.append('study', metadata.studyId);
-            formData.append('site', 'DEFAULT_SITE'); // Required field
-            formData.append('country', 'US'); // Required field
-            formData.append('documentType', metadata.category); // Required field
-            formData.append('documentId', `DOC-${Date.now()}`); // Generate unique document ID
-            formData.append('documentDate', new Date().toISOString()); // Required field
-            formData.append('mimeType', file.type); // Required field
-            formData.append('fileSize', file.size.toString()); // Required field
-            formData.append('tmfReference', `TMF-${Date.now()}`); // Required field
-            formData.append('uploadedBy', 'system'); // Required field
-            formData.append('author', 'system'); // Required field
-
-            // Add additional metadata as a separate field
-            const additionalMetadata = {
-                version: metadata.version || '1.0',
-                notes: metadata.notes || '',
-                status: 'DRAFT',
-                category: metadata.category,
-                studyId: metadata.studyId,
-                mimeType: file.type,
-                fileSize: file.size,
-                documentDate: new Date().toISOString(),
-                uploadedBy: 'system',
-                author: 'system'
-            };
-            formData.append('metadata', JSON.stringify(additionalMetadata));
-
-            // Log what we're sending
-            console.log('Sending form data with fields:', {
-                title: metadata.title.trim(),
-                type: metadata.category.toUpperCase(),
-                study: metadata.studyId,
-                site: 'DEFAULT_SITE',
-                country: 'US',
-                documentType: metadata.category,
-                documentId: `DOC-${Date.now()}`,
-                documentDate: new Date().toISOString(),
-                mimeType: file.type,
-                fileSize: file.size,
-                tmfReference: `TMF-${Date.now()}`,
-                uploadedBy: 'system',
-                author: 'system'
+            const response = await axios.post(`${API_URL}/documents/upload`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+                onUploadProgress
             });
-
-            try {
-                const response = await axios.post(`${API_URL}/documents/upload`, formData, {
-      headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                    onUploadProgress
-                });
-
-                console.log('Upload response:', response.data);
-                return response.data;
-            } catch (axiosError) {
-                console.error('Axios error:', {
-                    status: axiosError.response?.status,
-                    statusText: axiosError.response?.statusText,
-                    data: axiosError.response?.data,
-                    headers: axiosError.response?.headers
-                });
-                throw new Error(axiosError.response?.data?.message || 'Failed to upload document');
-            }
+            return response.data;
         } catch (error) {
-            console.error('Upload error:', error);
-            throw error;
+            this.handleError(error);
         }
     }
 
     async updateDocumentStatus(documentId: string, status: string) {
-        const response = await axios.patch(`${API_URL}/documents/${documentId}/status`, {
-            status,
-        });
-        return response.data;
+        try {
+            const response = await axios.patch(`${API_URL}/documents/${documentId}/status`, { status });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
     }
 
     async deleteDocument(documentId: string) {
-        const response = await axios.delete(`${API_URL}/documents/${documentId}`);
-        return response.data;
+        try {
+            const response = await axios.delete(`${API_URL}/documents/${documentId}`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
     }
 
     async getDocument(documentId: string) {
-        const response = await axios.get(`${API_URL}/documents/${documentId}`);
-        return response.data;
+        try {
+            const response = await axios.get(`${API_URL}/documents/${documentId}`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
     }
 
     async downloadDocument(documentId: string) {
-        const response = await axios.get(`${API_URL}/documents/${documentId}/download`, {
-            responseType: 'blob',
-        });
-        return response.data;
+        try {
+            const response = await axios.get(`${API_URL}/documents/${documentId}/download`, {
+                responseType: 'blob',
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error);
+        }
+    }
+
+    private handleError(error: unknown): never {
+        if (error instanceof AxiosError) {
+            throw new Error(error.response?.data?.message || error.message);
+        }
+        throw new Error('An unexpected error occurred');
     }
 }
 
