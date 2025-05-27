@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -28,10 +28,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, Edit2, Trash2, Mail, UserPlus, X } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import sponsorService from '../services/sponsor.service';
 
-const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
+const SponsorManagement = () => {
   const [open, setOpen] = useState(false);
   const [editingSponsor, setEditingSponsor] = useState(null);
+  const [sponsors, setSponsors] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -51,7 +54,8 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
     regulatoryInfo: {
       dunsNumber: '',
       feiNumber: '',
-      gcpComplianceStatus: 'PENDING_REVIEW'
+      gcpComplianceStatus: 'PENDING_REVIEW',
+      certifications: []
     },
     contacts: [],
     pendingInvites: []
@@ -70,9 +74,29 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
     'OTHER'
   ];
 
-  const statuses = ['ACTIVE', 'INACTIVE', 'PENDING_APPROVAL'];
-  const complianceStatuses = ['COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW'];
+  const sponsorStatuses = ['ACTIVE', 'INACTIVE', 'PENDING_APPROVAL'];
   const adminRoles = ['SPONSOR_ADMIN', 'SPONSOR_MONITOR', 'SPONSOR_CRA'];
+  const gcpComplianceStatuses = ['COMPLIANT', 'NON_COMPLIANT', 'PENDING_REVIEW'];
+
+  useEffect(() => {
+    fetchSponsors();
+  }, []);
+
+  const fetchSponsors = async () => {
+    try {
+      setLoading(true);
+      const response = await sponsorService.getSponsors();
+      setSponsors(response.data);
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to fetch sponsors",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleOpen = (sponsor = null) => {
     if (sponsor) {
@@ -99,7 +123,8 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
         regulatoryInfo: {
           dunsNumber: '',
           feiNumber: '',
-          gcpComplianceStatus: 'PENDING_REVIEW'
+          gcpComplianceStatus: 'PENDING_REVIEW',
+          certifications: []
         },
         contacts: [],
         pendingInvites: []
@@ -148,7 +173,7 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
     }));
   };
 
-  const handleSendInvite = () => {
+  const handleSendInvite = async () => {
     if (!inviteEmail || !inviteRole) {
       toast({
         title: "Error",
@@ -158,60 +183,142 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
       return;
     }
 
-    const newInvite = {
-      id: Date.now().toString(),
-      email: inviteEmail,
-      role: inviteRole,
-      status: 'PENDING',
-      sentAt: new Date().toISOString()
-    };
+    try {
+      const response = await sponsorService.sendInvitation(editingSponsor._id, {
+        email: inviteEmail,
+        role: inviteRole
+      });
 
-    setFormData(prev => ({
-      ...prev,
-      pendingInvites: [...(prev.pendingInvites || []), newInvite]
-    }));
+      setFormData(prev => ({
+        ...prev,
+        pendingInvites: [...(prev.pendingInvites || []), response.data]
+      }));
 
-    // In a real application, you would send an email here
-    toast({
-      title: "Invitation Sent",
-      description: `Invitation sent to ${inviteEmail} for role ${inviteRole}`
-    });
+      toast({
+        title: "Success",
+        description: `Invitation sent to ${inviteEmail}`
+      });
 
-    setInviteEmail('');
-    setInviteRole('SPONSOR_ADMIN');
+      setInviteEmail('');
+      setInviteRole('SPONSOR_ADMIN');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to send invitation",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleRemoveInvite = (inviteId) => {
-    setFormData(prev => ({
-      ...prev,
-      pendingInvites: prev.pendingInvites.filter(invite => invite.id !== inviteId)
-    }));
+  const handleRemoveInvite = async (inviteId) => {
+    try {
+      await sponsorService.removeInvitation(editingSponsor._id, inviteId);
+      setFormData(prev => ({
+        ...prev,
+        pendingInvites: prev.pendingInvites.filter(invite => invite._id !== inviteId)
+      }));
+      toast({
+        title: "Success",
+        description: "Invitation removed successfully"
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to remove invitation",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Transform the data to match backend requirements exactly
+      const transformedData = {
+        name: formData.name.trim(),
+        type: formData.type,
+        status: formData.status,
+        contactInfo: {
+          email: formData.contactInfo.email.trim(),
+          phone: formData.contactInfo.phone.trim(),
+          website: formData.contactInfo.website?.trim() || undefined,
+          address: {
+            street: formData.contactInfo.address.street.trim(),
+            city: formData.contactInfo.address.city.trim(),
+            state: formData.contactInfo.address.state.trim(),
+            country: formData.contactInfo.address.country.trim(),
+            postalCode: formData.contactInfo.address.postalCode.trim()
+          }
+        },
+        regulatoryInfo: {
+          dunsNumber: formData.regulatoryInfo.dunsNumber.replace(/\D/g, '').slice(0, 9),
+          feiNumber: formData.regulatoryInfo.feiNumber.replace(/\D/g, '').slice(0, 10),
+          gcpComplianceStatus: formData.regulatoryInfo.gcpComplianceStatus || 'PENDING_REVIEW',
+          certifications: formData.regulatoryInfo.certifications || []
+        },
+        contacts: formData.contacts || [],
+        pendingInvites: formData.pendingInvites || []
+      };
+
+      // Remove undefined and empty values
+      const cleanData = JSON.parse(JSON.stringify(transformedData, (key, value) => {
+        if (value === '' || value === null || value === undefined) {
+          return undefined;
+        }
+        return value;
+      }));
+
       if (editingSponsor) {
-        onUpdate({ ...editingSponsor, ...formData });
+        const response = await sponsorService.updateSponsor(editingSponsor._id, cleanData);
+        setSponsors(sponsors.map(sponsor => 
+          sponsor._id === editingSponsor._id ? response.data : sponsor
+        ));
+        toast({
+          title: "Success",
+          description: "Sponsor updated successfully"
+        });
       } else {
-        onUpdate({
-          _id: Date.now().toString(),
-          sponsorId: `SP${Date.now().toString().slice(-6)}`,
-          ...formData,
-          createdAt: new Date().toISOString()
+        const response = await sponsorService.createSponsor(cleanData);
+        setSponsors([...sponsors, response.data]);
+        toast({
+          title: "Success",
+          description: "Sponsor created successfully"
         });
       }
       handleClose();
     } catch (error) {
-      console.error('Error saving sponsor:', error);
+      console.error('Validation Error:', error.response?.data);
+      toast({
+        title: "Error",
+        description: error.response?.data?.error || "Failed to save sponsor",
+        variant: "destructive"
+      });
     }
   };
 
   const handleDelete = async (sponsorId) => {
     if (window.confirm('Are you sure you want to delete this sponsor?')) {
-      onDelete(sponsorId);
+      try {
+        await sponsorService.deleteSponsor(sponsorId);
+        setSponsors(sponsors.filter(sponsor => sponsor._id !== sponsorId));
+        toast({
+          title: "Success",
+          description: "Sponsor deleted successfully"
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: error.response?.data?.error || "Failed to delete sponsor",
+          variant: "destructive"
+        });
+      }
     }
   };
+
+  if (loading) {
+    
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -288,7 +395,7 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
+                <Label htmlFor="name">Name *</Label>
                 <Input
                   id="name"
                   name="name"
@@ -298,17 +405,18 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Type</Label>
+                <Label>Type *</Label>
                 <Select
                   value={formData.type}
                   onValueChange={(value) => setFormData(prev => ({ ...prev, type: value }))}
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
                     {sponsorTypes.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                      <SelectItem key={type} value={type}>{type.toUpperCase()}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -319,22 +427,24 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
               <h3 className="text-lg font-semibold">Contact Information</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
                     name="contactInfo.email"
                     type="email"
                     value={formData.contactInfo?.email || ''}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">Phone *</Label>
                   <Input
                     id="phone"
                     name="contactInfo.phone"
                     value={formData.contactInfo?.phone || ''}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -410,6 +520,7 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
                     name="regulatoryInfo.dunsNumber"
                     value={formData.regulatoryInfo?.dunsNumber || ''}
                     onChange={handleInputChange}
+                    placeholder="9 digits"
                   />
                 </div>
                 <div className="space-y-2">
@@ -419,6 +530,7 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
                     name="regulatoryInfo.feiNumber"
                     value={formData.regulatoryInfo?.feiNumber || ''}
                     onChange={handleInputChange}
+                    placeholder="10 digits"
                   />
                 </div>
                 <div className="space-y-2">
@@ -437,7 +549,7 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      {complianceStatuses.map(status => (
+                      {gcpComplianceStatuses.map(status => (
                         <SelectItem key={status} value={status}>{status}</SelectItem>
                       ))}
                     </SelectContent>
@@ -451,20 +563,22 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
               <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="inviteEmail">Email Address</Label>
+                    <Label htmlFor="inviteEmail">Email Address *</Label>
                     <Input
                       id="inviteEmail"
                       type="email"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       placeholder="Enter email address"
+                      required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Role</Label>
+                    <Label>Role *</Label>
                     <Select
                       value={inviteRole}
                       onValueChange={setInviteRole}
+                      required
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select role" />
@@ -512,6 +626,24 @@ const SponsorManagement = ({ sponsors, onUpdate, onDelete }) => {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Status *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sponsorStatuses.map(status => (
+                    <SelectItem key={status} value={status}>{status.toUpperCase()}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <DialogFooter>
