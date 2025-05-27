@@ -38,10 +38,9 @@ import {
   Download 
 } from 'lucide-react';
 
-import documentService  from '../../services/document.service';
+import documentService from '../../services/document.service';
 
 const ContentArea = ({ selectedItem }) => {
-
   const navigate = useNavigate();
   const [documents, setDocuments] = useState([]);
   const [sorting, setSorting] = useState([]);
@@ -53,13 +52,12 @@ const ContentArea = ({ selectedItem }) => {
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
-        let fetchedDocuments = [];
-
-        fetchedDocuments = await documentService.getAllDocuments();
-
-        console.log("Fetched documents:", fetchedDocuments);
-
-        setDocuments(fetchedDocuments || []); 
+        const response = await documentService.getAllDocuments();
+        console.log("Fetched documents:", response);
+        
+        // Extract the data array from the response
+        const fetchedDocuments = response?.data || [];
+        setDocuments(fetchedDocuments);
       } catch (error) {
         console.error('Error fetching documents:', error);
         setDocuments([]);
@@ -72,9 +70,9 @@ const ContentArea = ({ selectedItem }) => {
   // Columns definition with download and additional fields
   const columns = useMemo(() => [
     {
-      accessorKey: "documentTitle",
+      accessorKey: "title",
       header: "Title",
-      cell: ({ row }) => <div className="px-2 text-left">{row.getValue("documentTitle") || 'N/A'}</div>,
+      cell: ({ row }) => <div className="px-2 text-left">{row.getValue("title") || 'N/A'}</div>,
     },
     {
       accessorKey: "status",
@@ -129,11 +127,29 @@ const ContentArea = ({ selectedItem }) => {
       cell: ({ row }) => <div className="px-2 text-left">{row.original.subArtifact?.subArtifactName || 'N/A'}</div>,
     },
     {
+      accessorKey: "documentType",
+      header: "Document Type",
+      cell: ({ row }) => <div className="px-2 text-left">{row.getValue("documentType") || 'N/A'}</div>,
+    },
+    {
+      accessorKey: "tmfReference",
+      header: "TMF Reference",
+      cell: ({ row }) => <div className="px-2 text-left">{row.getValue("tmfReference") || 'N/A'}</div>,
+    },
+    {
       accessorKey: "createdAt",
       header: "Created At",
       cell: ({ row }) => {
         const createdAt = row.getValue("createdAt");
         return <div className="px-2 text-center">{createdAt ? new Date(createdAt).toLocaleDateString() : 'N/A'}</div>;
+      },
+    },
+    {
+      accessorKey: "documentDate",
+      header: "Document Date",
+      cell: ({ row }) => {
+        const date = row.getValue("documentDate");
+        return <div className="px-2 text-center">{date ? new Date(date).toLocaleDateString() : 'N/A'}</div>;
       },
     },
     {
@@ -150,13 +166,13 @@ const ContentArea = ({ selectedItem }) => {
       cell: ({ row }) => (
         <a 
           href={row.original.fileUrl} 
-          download={row.original.fileName}
+          download
           target="_blank" 
           rel="noopener noreferrer"
           className="text-blue-500 hover:underline flex items-center px-2 text-left"
         >
           <Download className="mr-2 h-4 w-4" /> 
-          {row.original.fileName}
+          Download
         </a>
       ),
     },
@@ -188,8 +204,8 @@ const ContentArea = ({ selectedItem }) => {
     table.setGlobalFilter(value);
   };
 
-  const handleRowClick = (id) => {
-    navigate(`/tmf-viewer/document/${id}`, { replace: true });
+  const handleRowClick = (documentId) => {
+    navigate(`/tmf-viewer/document/${documentId}`, { replace: true });
   }
 
   return (
@@ -267,8 +283,9 @@ const ContentArea = ({ selectedItem }) => {
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        handleRowClick(row.original._id);
+                        handleRowClick(row.original.documentId);
                       }}
+                      className="cursor-pointer hover:bg-gray-50"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
