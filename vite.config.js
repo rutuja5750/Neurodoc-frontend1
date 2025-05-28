@@ -16,7 +16,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://neurodoc-backend-ffe6bzdqhee4c0h6.canadacentral-01.azurewebsites.net/',
+        target: 'https://neurodoc-backend-ffe6bzdqhee4c0h6.canadacentral-01.azurewebsites.net',
         changeOrigin: true,
         secure: false,
       },
