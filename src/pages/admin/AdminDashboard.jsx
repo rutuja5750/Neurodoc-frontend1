@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,40 +16,65 @@ import SiteManagement from './SiteManagement';
 import SiteAssignmentManagement from '../../components/sites/SiteAssignmentManagement';
 import ClinicalTrialsPage from '../clinical-trials/ClinicalTrialsPage';
 import TMF_Viewer from '../tmf_viewer/TMFViewer';
+import { useToast } from "@/components/ui/use-toast";
+import axios from 'axios';
+import { config } from '../../config/config';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [metrics, setMetrics] = useState({
+    users: { total: 0, active: 0, pending: 0, deactivated: 0, growth: 0 },
+    studies: { total: 0, active: 0, completed: 0, draft: 0, compliance: 0 },
+    documents: { total: 0, pending: 0, approved: 0, rejected: 0, processingTime: 0 },
+    system: { uptime: 0, activeUsers: 0, pendingTasks: 0, alerts: 0 }
+  });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [systemAlerts, setSystemAlerts] = useState([]);
+  const [complianceMetrics, setComplianceMetrics] = useState({
+    documentCompliance: 0,
+    userTraining: 0,
+    auditReadiness: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  // Mock data for dashboard metrics
-  const metrics = {
-    users: {
-      total: 1247,
-      active: 892,
-      pending: 156,
-      deactivated: 199,
-      growth: 12.5
-    },
-    studies: {
-      total: 86,
-      active: 45,
-      completed: 28,
-      draft: 13,
-      compliance: 98.2
-    },
-    documents: {
-      total: 15234,
-      pending: 234,
-      approved: 14789,
-      rejected: 211,
-      processingTime: 2.3
-    },
-    system: {
-      uptime: 99.99,
-      activeUsers: 127,
-      pendingTasks: 45,
-      alerts: 2
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [metricsRes, activityRes, alertsRes, complianceRes] = await Promise.all([
+        axios.get(`${config.API_URL}/admin/metrics`),
+        axios.get(`${config.API_URL}/admin/recent-activity`),
+        axios.get(`${config.API_URL}/admin/system-alerts`),
+        axios.get(`${config.API_URL}/admin/compliance-metrics`)
+      ]);
+
+      setMetrics(metricsRes.data);
+      setRecentActivity(activityRes.data);
+      setSystemAlerts(alertsRes.data);
+      setComplianceMetrics(complianceRes.data);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+      toast({
+        title: "Error",
+        description: error.response?.data?.message || "Failed to fetch dashboard data",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
@@ -157,7 +182,7 @@ const AdminDashboard = () => {
             <QuickStatCard
               title="Active Studies"
               value={metrics.studies.total}
-              change={8.3}
+              change={metrics.studies.growth}
               icon={<FileText className="w-4 h-4" />}
               details={[
                 { label: 'In Progress', value: metrics.studies.active },
@@ -168,7 +193,7 @@ const AdminDashboard = () => {
             <QuickStatCard
               title="Document Processing"
               value={`${metrics.documents.processingTime}d`}
-              change={-0.5}
+              change={metrics.documents.growth}
               icon={<Activity className="w-4 h-4" />}
               details={[
                 { label: 'Pending', value: metrics.documents.pending },
@@ -179,7 +204,7 @@ const AdminDashboard = () => {
             <QuickStatCard
               title="System Health"
               value={`${metrics.system.uptime}%`}
-              change={0.01}
+              change={metrics.system.growth}
               icon={<Globe2 className="w-4 h-4" />}
               details={[
                 { label: 'Active Users', value: metrics.system.activeUsers },
@@ -197,7 +222,7 @@ const AdminDashboard = () => {
                   <h3 className="text-lg font-semibold">Recent Activity</h3>
                   <Button variant="ghost" size="sm">View All</Button>
                 </div>
-                <ActivityList />
+                <ActivityList activities={recentActivity} />
               </CardContent>
             </Card>
             <Card>
@@ -206,7 +231,7 @@ const AdminDashboard = () => {
                   <h3 className="text-lg font-semibold">System Alerts</h3>
                   <Button variant="ghost" size="sm">View All</Button>
                 </div>
-                <AlertsList />
+                <AlertsList alerts={systemAlerts} />
               </CardContent>
             </Card>
           </div>
@@ -221,18 +246,18 @@ const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <ComplianceMetric
                   title="Document Compliance"
-                  percentage={98.2}
-                  trend="up"
+                  percentage={complianceMetrics.documentCompliance}
+                  trend={complianceMetrics.documentComplianceTrend}
                 />
                 <ComplianceMetric
                   title="User Training Status"
-                  percentage={94.5}
-                  trend="up"
+                  percentage={complianceMetrics.userTraining}
+                  trend={complianceMetrics.userTrainingTrend}
                 />
                 <ComplianceMetric
                   title="Audit Readiness"
-                  percentage={96.7}
-                  trend="stable"
+                  percentage={complianceMetrics.auditReadiness}
+                  trend={complianceMetrics.auditReadinessTrend}
                 />
               </div>
             </CardContent>
@@ -326,26 +351,12 @@ const QuickStatCard = ({ title, value, change, icon, details }) => (
   </Card>
 );
 
-const ActivityList = () => (
+const ActivityList = ({ activities }) => (
   <div className="space-y-4">
-    {[
-      {
-        icon: <Users className="w-4 h-4" />,
-        action: "New user registration",
-        details: "John Doe (Research Coordinator)",
-        time: "5 minutes ago"
-      },
-      {
-        icon: <FileText className="w-4 h-4" />,
-        action: "Study protocol updated",
-        details: "STUDY-2024-001",
-        time: "1 hour ago"
-      },
-      // Add more activities...
-    ].map((activity, index) => (
+    {activities.map((activity, index) => (
       <div key={index} className="flex items-start gap-4">
         <div className="p-2 rounded-full bg-primary/10">
-          {activity.icon}
+          {getActivityIcon(activity.type)}
         </div>
         <div className="flex-1">
           <p className="font-medium">{activity.action}</p>
@@ -357,26 +368,12 @@ const ActivityList = () => (
   </div>
 );
 
-const AlertsList = () => (
+const AlertsList = ({ alerts }) => (
   <div className="space-y-4">
-    {[
-      {
-        icon: <AlertTriangle className="w-4 h-4 text-yellow-500" />,
-        title: "Storage Usage Warning",
-        message: "Storage capacity at 85%",
-        time: "10 minutes ago"
-      },
-      {
-        icon: <Clock className="w-4 h-4 text-blue-500" />,
-        title: "Scheduled Maintenance",
-        message: "System update scheduled for tonight",
-        time: "2 hours ago"
-      },
-      // Add more alerts...
-    ].map((alert, index) => (
+    {alerts.map((alert, index) => (
       <div key={index} className="flex items-start gap-4">
         <div className="p-2 rounded-full bg-primary/10">
-          {alert.icon}
+          {getAlertIcon(alert.type)}
         </div>
         <div className="flex-1">
           <p className="font-medium">{alert.title}</p>
@@ -416,5 +413,27 @@ const TrendingStable = ({ className }) => (
     <line x1="5" y1="12" x2="19" y2="12"></line>
   </svg>
 );
+
+// Helper functions for icons
+const getActivityIcon = (type) => {
+  const icons = {
+    user: <Users className="w-4 h-4" />,
+    document: <FileText className="w-4 h-4" />,
+    study: <ClipboardList className="w-4 h-4" />,
+    default: <Activity className="w-4 h-4" />
+  };
+  return icons[type] || icons.default;
+};
+
+const getAlertIcon = (type) => {
+  const icons = {
+    warning: <AlertTriangle className="w-4 h-4 text-yellow-500" />,
+    info: <Clock className="w-4 h-4 text-blue-500" />,
+    error: <XCircle className="w-4 h-4 text-red-500" />,
+    success: <CheckCircle2 className="w-4 h-4 text-green-500" />,
+    default: <AlertTriangle className="w-4 h-4" />
+  };
+  return icons[type] || icons.default;
+};
 
 export default AdminDashboard; 

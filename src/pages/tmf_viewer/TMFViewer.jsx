@@ -65,7 +65,8 @@ const TMFViewer = () => {
           },
           // Add more mock documents...
         ]);
-      } catch (err) {
+      } catch (error) {
+        console.error('Error fetching facilities:', error);
         setFacilities([]);
       }
       setLoading(false);
@@ -87,24 +88,39 @@ const TMFViewer = () => {
       <ContentArea>
         <div className="flex flex-col h-full bg-gray-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 bg-white border-b shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="text-2xl font-bold text-blue-800">TMF Viewer</div>
-              <Badge variant="outline" className="bg-blue-50 text-blue-700">
-                {documents.length} Documents
-              </Badge>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={() => setLoading(true)}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </Button>
-              <Button
-                className="flex items-center gap-2"
-                onClick={() => setFacilityDialogOpen(true)}
-              >
-                <Plus className="h-4 w-4" /> Add Facility
-              </Button>
+          <div className="flex flex-col items-center px-8 py-5 bg-white border-b">
+            <div className="w-full max-w-5xl flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center text-center">
+                <div className="text-2xl font-semibold text-gray-900">TMF Viewer</div>
+                <div className="text-sm text-gray-500 mt-0.5">Manage and organize your trial master files</div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1">
+                  {documents.length} Documents
+                </Badge>
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                  Active
+                </Badge>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setLoading(true)}
+                  className="border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Refresh Data
+                </Button>
+                <Button
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 transition-colors"
+                  onClick={() => setFacilityDialogOpen(true)}
+                >
+                  <Plus className="h-4 w-4" /> Add New Facility
+                </Button>
+              </div>
             </div>
           </div>
 
